@@ -10,17 +10,17 @@ import lombok.Data;
 @AllArgsConstructor
 public class GamesDTO {
   
-  @NotBlank
+  @NotBlank(message = "Name cannot be null or empty")
   private String name;
 
   private String image;
 
   @NotNull
-  @Positive
+  @Positive(message = "Stock total must be a positive number")
   private int stockTotal;
 
   @NotNull
-  @Positive
+  @Positive(message = "Price per day must be a positive number")
   private int pricePerDay;
 
 }

@@ -22,7 +22,7 @@ public class GamesService {
   // Method to create a new game
   public GamesModel createGames(GamesDTO body) {
     if (gamesRepository.existsByName(body.getName())) {
-      throw new GamesNameConflictException("Game with this name already exists.");
+      throw new GamesNameConflictException("A game with this name already exists.");
     }
 
     return gamesRepository.save(new GamesModel(body));

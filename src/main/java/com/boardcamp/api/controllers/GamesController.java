@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
@@ -25,10 +26,14 @@ public class GamesController {
     this.gamesService = gamesService;
   }
 
-  @PostMapping()
+  @PostMapping() // Creates a new game
   public ResponseEntity<GamesModel> postMethodName(@RequestBody @Valid GamesDTO body) {
-      GamesModel game = gamesService.createGames(body);
-      return ResponseEntity.status(HttpStatus.CREATED).body(game);
+      return ResponseEntity.status(HttpStatus.CREATED).body(gamesService.createGames(body));
+  }
+  
+  @GetMapping() // Gets all games
+  public ResponseEntity<Object> getMethodName() {
+      return ResponseEntity.status(HttpStatus.OK).body(gamesService.getAllGames());
   }
   
 

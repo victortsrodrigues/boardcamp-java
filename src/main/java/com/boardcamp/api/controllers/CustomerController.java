@@ -43,7 +43,5 @@ public class CustomerController {
   public ResponseEntity<CustomerModel> getCustomerById(@PathVariable("id") Long id) {
       return ResponseEntity.status(HttpStatus.OK).body(customerService.getCustomerById(id));
   }
-  
-  
 
 }

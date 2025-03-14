@@ -21,4 +21,14 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleCustomerNotFound(CustomerNotFoundException exception) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
   }
+
+  @ExceptionHandler({GameNotFoundException.class})
+  public ResponseEntity<String> handleGameNotFound(GameNotFoundException exception) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+  }
+
+  @ExceptionHandler({StockUnprocessableException.class})
+  public ResponseEntity<String> handleStockUnprocessable(StockUnprocessableException exception) {
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
+  }
 }

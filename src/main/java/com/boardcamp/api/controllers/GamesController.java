@@ -32,7 +32,7 @@ public class GamesController {
   }
   
   @GetMapping() // Gets all games
-  public ResponseEntity<Object> getMethodName() {
+  public ResponseEntity<Object> getGames() {
       return ResponseEntity.status(HttpStatus.OK).body(gamesService.getAllGames());
   }
   

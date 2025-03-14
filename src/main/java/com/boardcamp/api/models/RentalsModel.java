@@ -2,8 +2,6 @@ package com.boardcamp.api.models;
 
 import java.time.LocalDate;
 
-import com.boardcamp.api.dtos.RentalsDTO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

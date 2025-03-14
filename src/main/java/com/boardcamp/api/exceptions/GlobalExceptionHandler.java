@@ -31,4 +31,19 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleStockUnprocessable(StockUnprocessableException exception) {
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
   }
+
+  @ExceptionHandler({RentalsNotFoundException.class})
+  public ResponseEntity<String> handleRentalsNotFound(RentalsNotFoundException exception) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+  }
+
+  @ExceptionHandler({RentalsUnprocessableException.class})
+  public ResponseEntity<String> handleRentalsUnprocessable(RentalsUnprocessableException exception) {
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
+  }
+
+  @ExceptionHandler({RentalsReturnedException.class})
+  public ResponseEntity<String> handleRentalsReturned(RentalsReturnedException exception) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+  }
 }

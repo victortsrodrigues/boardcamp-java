@@ -10,6 +10,7 @@ import com.boardcamp.api.dtos.RentalsDTO;
 import com.boardcamp.api.exceptions.CustomerNotFoundException;
 import com.boardcamp.api.exceptions.GameNotFoundException;
 import com.boardcamp.api.exceptions.RentalsNotFoundException;
+import com.boardcamp.api.exceptions.RentalsReturnedException;
 import com.boardcamp.api.exceptions.RentalsUnprocessableException;
 import com.boardcamp.api.exceptions.StockUnprocessableException;
 import com.boardcamp.api.models.CustomerModel;
@@ -44,7 +45,7 @@ public class RentalsService {
     CustomerModel customer = customerRepository.findById(body.getCustomerId())
         .orElseThrow(() -> new CustomerNotFoundException("Customer not found."));
     // Defining the rental values
-    LocalDate rentDate = LocalDate.of(2025, 3, 11);
+    LocalDate rentDate = LocalDate.now();
     int originalPrice = body.getDaysRented() * game.getPricePerDay();
     LocalDate returnDate = null;
     int delayFee = 0;
@@ -62,7 +63,7 @@ public class RentalsService {
   public RentalsModel updateRental(Long id) {
     // Error handling
     RentalsModel rental = rentalsRepository.findById(id)
-        .orElseThrow(() -> new RentalsNotFoundException("Rental not found."));
+        .orElseThrow((RentalsNotFoundException::new));
     if (rental.getReturnDate() != null) {
       throw new RentalsUnprocessableException("Rental already returned.");
     }
@@ -73,6 +74,18 @@ public class RentalsService {
     }
     rental.setDelayFee((int) delayDays * rental.getGame().getPricePerDay());
     return rentalsRepository.save(rental);
+  }
+
+  // Service method to DELETE a rental by ID
+  public void deleteRental(Long id) {
+    // Error handling
+    RentalsModel rental = rentalsRepository.findById(id)
+        .orElseThrow((RentalsNotFoundException::new));
+    if (rental.getReturnDate() != null) {
+      throw new RentalsReturnedException("Rental already returned.");
+    }
+
+    rentalsRepository.deleteById(id);
   }
 
 }

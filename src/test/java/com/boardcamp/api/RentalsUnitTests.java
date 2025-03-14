@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import com.boardcamp.api.dtos.RentalsDTO;
 import com.boardcamp.api.exceptions.CustomerNotFoundException;
 import com.boardcamp.api.exceptions.GameNotFoundException;
 import com.boardcamp.api.exceptions.RentalsNotFoundException;
+import com.boardcamp.api.exceptions.RentalsReturnedException;
 import com.boardcamp.api.exceptions.RentalsUnprocessableException;
 import com.boardcamp.api.exceptions.StockUnprocessableException;
 import com.boardcamp.api.models.CustomerModel;
@@ -223,6 +225,62 @@ class RentalsUnitTests {
     verify(rentalsRepository, times(1)).save(rental);
   }
 
+  // Test to DELETE rental - rental not found
+  @Test
+  void givenRentalNotFound_whenDeleteRental_thenThrowRentalNotFoundException() {
+    // Arrange
+    doReturn(Optional.empty()).when(rentalsRepository).findById(any());
+    // Act
+    RentalsNotFoundException exception = assertThrows(RentalsNotFoundException.class, () -> {
+      rentalsService.deleteRental(1L);
+    });
+    // Assert
+    assertNotNull(exception);
+    verify(rentalsRepository, times(1)).findById(any());
+    assertEquals(null, exception.getMessage());
+  }
 
-  
+  // Test to DELETE rental - reantal already returned
+  @Test
+  void givenRentalAlreadyReturned_whenDeleteRental_thenThrowRentalAlreadyReturnedException() {
+    // Arrange
+    RentalsModel rental = new RentalsModel(
+        LocalDate.now(),
+        1,
+        LocalDate.now().plusDays(3),
+        10,
+        0,
+        new CustomerModel(1L, "11111111111", "11111111111", "teste"),
+        new GamesModel(1L, "test1", "test1", 10, 10));
+    doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+    // Act
+    RentalsReturnedException exception = assertThrows(RentalsReturnedException.class, () -> {
+      rentalsService.deleteRental(1L);
+    });
+    // Assert
+    assertNotNull(exception);
+    verify(rentalsRepository, times(1)).findById(any());
+    assertEquals("Rental already returned.", exception.getMessage());
+  }
+
+  // Test to DELETE rental - success
+  @Test
+  void givenValidRental_whenDeleteRental_thenSuccess() {
+    // Arrange
+    RentalsModel rental = new RentalsModel(
+        LocalDate.now(),
+        1,
+        null,
+        10,
+        0,
+        new CustomerModel(1L, "11111111111", "11111111111", "teste"),
+        new GamesModel(1L, "test1", "test1", 10, 10));
+    doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+    // Act
+    rentalsService.deleteRental(1L);
+    // Assert
+    verify(rentalsRepository, times(1)).findById(any());
+    verify(rentalsRepository, times(1)).deleteById(any());
+    verifyNoMoreInteractions(rentalsRepository);
+  }
 }

@@ -256,4 +256,86 @@ class RentalsIntegrationTests {
     assertEquals(1, rentalsRepository.count());
   }
 
+  // Test delete rental - not found
+  @Test
+  void givenRentalNotFound_whenDeleteRental_thenThrowRentalNotFoundException() {
+    // Arrange
+    CustomerModel customer1 = customerRepository.save(new CustomerModel(null, "11111111111", "11111111111", "Test1"));
+    GamesModel game1 = gamesRepository.save(new GamesModel(null, "Test1", "Test1", 10, 10));
+    RentalsModel rental = new RentalsModel(
+        LocalDate.now(),
+        1,
+        null,
+        10,
+        0,
+        customer1,
+        game1);
+    RentalsModel deletedRental = rentalsRepository.save(rental);
+    rentalsRepository.deleteById(deletedRental.getId());
+    // Act
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/" + deletedRental.getId(),
+        HttpMethod.DELETE,
+        null,
+        String.class,
+        deletedRental.getId());
+    // Assert
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals(0, rentalsRepository.count());
+  }
+
+  // Test delete rental - rental already returned
+  @Test
+  void givenRentalAlreadyReturned_whenDeleteRental_thenThrowRentalAlreadyReturnedException() {
+    // Arrange
+    CustomerModel customer1 = customerRepository.save(new CustomerModel(null, "11111111111", "11111111111", "Test1"));
+    GamesModel game1 = gamesRepository.save(new GamesModel(null, "Test1", "Test1", 10, 10));
+    RentalsModel rental = new RentalsModel(
+        LocalDate.now(),
+        1,
+        LocalDate.now().plusDays(5),
+        10,
+        0,
+        customer1,
+        game1);
+    RentalsModel savedRental = rentalsRepository.save(rental);
+    // Act
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/" + savedRental.getId(),
+        HttpMethod.DELETE,
+        null,
+        String.class,
+        savedRental.getId());
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(1, rentalsRepository.count());
+    assertEquals("Rental already returned.", response.getBody());
+  }
+
+  // Test delete rental - success
+  @Test
+  void givenValidRental_whenDeleteRental_thenSuccess() {
+    // Arrange
+    CustomerModel customer1 = customerRepository.save(new CustomerModel(null, "11111111111", "11111111111", "Test1"));
+    GamesModel game1 = gamesRepository.save(new GamesModel(null, "Test1", "Test1", 10, 10));
+    RentalsModel rental = new RentalsModel(
+        LocalDate.now().minusDays(5),
+        1,
+        null,
+        10,
+        0,
+        customer1,
+        game1);
+    RentalsModel savedRental = rentalsRepository.save(rental);
+    // Act
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/" + savedRental.getId(),
+        HttpMethod.DELETE,
+        null,
+        String.class,
+        savedRental.getId());
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(0, rentalsRepository.count());
+  }
 }

@@ -29,7 +29,7 @@ import com.boardcamp.api.repositories.RentalsRepository;
 import com.boardcamp.api.services.RentalsService;
 
 @SpringBootTest
-public class RentalsUnitTests {
+class RentalsUnitTests {
   
   @InjectMocks
   private RentalsService rentalsService;
